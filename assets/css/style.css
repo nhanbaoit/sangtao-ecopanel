@@ -600,13 +600,15 @@ button {
   transition: transform 0.2s ease;
 }
 
-.dropdown-link:hover {
+.dropdown-link:hover,
+.dropdown-link.active {
   background-color: var(--color-primary-bg);
   color: var(--color-primary);
   padding-left: 22px;
 }
 
-.dropdown-link:hover i {
+.dropdown-link:hover i,
+.dropdown-link.active i {
   transform: translateX(3px);
 }
 

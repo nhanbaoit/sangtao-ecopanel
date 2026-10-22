@@ -305,7 +305,50 @@ function initUI() {
     });
   });
 
-  // 9. SMOOTH SCROLLING FOR ALL NAV LINKS
+  // 9. ACTIVE NAV STATE MANAGEMENT & SMOOTH SCROLLING
+  const navItems = document.querySelectorAll('.header-nav .nav-item');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+  function setActiveNavItem(targetHref) {
+    if (!targetHref) return;
+
+    // 1. Cập nhật Menu Desktop
+    navItems.forEach((item) => {
+      const mainLink = item.querySelector('.nav-link');
+      const subLinks = item.querySelectorAll('.dropdown-link');
+      let isMatch = false;
+
+      if (mainLink && mainLink.getAttribute('href') === targetHref) {
+        isMatch = true;
+      }
+
+      subLinks.forEach((sub) => {
+        if (sub.getAttribute('href') === targetHref) {
+          isMatch = true;
+          sub.classList.add('active');
+        } else {
+          sub.classList.remove('active');
+        }
+      });
+
+      if (isMatch) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    // 2. Cập nhật Menu Di Động
+    mobileNavLinks.forEach((mLink) => {
+      if (mLink.getAttribute('href') === targetHref) {
+        mLink.classList.add('active');
+      } else {
+        mLink.classList.remove('active');
+      }
+    });
+  }
+
+  // Xử lý sự kiện click trên các liên kết điều hướng
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
       const targetId = this.getAttribute('href');
@@ -313,6 +356,8 @@ function initUI() {
         const targetElement = document.querySelector(targetId);
         if (targetElement) {
           e.preventDefault();
+          setActiveNavItem(targetId);
+
           const headerOffset = 85;
           const elementPosition = targetElement.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -325,4 +370,54 @@ function initUI() {
       }
     });
   });
+
+  // 10. SCROLLSPY - TỰ ĐỘNG ĐỔI MÀU MENU KHI CUỘN ĐẾN SECTION TƯƠNG ỨNG
+  const trackedSections = [
+    { id: '#trang-chu', el: document.querySelector('#trang-chu') },
+    { id: '#gioi-thieu', el: document.querySelector('#gioi-thieu') },
+    { id: '#panel', el: document.querySelector('#panel') },
+    { id: '#thi-cong', el: document.querySelector('#thi-cong') },
+    { id: '#du-an', el: document.querySelector('#du-an') },
+    { id: '#tin-tuc', el: document.querySelector('#tin-tuc') },
+    { id: '#lien-he', el: document.querySelector('#lien-he') },
+  ];
+
+  let isScrollTimeout;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (isScrollTimeout) clearTimeout(isScrollTimeout);
+      isScrollTimeout = setTimeout(() => {
+        const scrollPosition = window.pageYOffset + 120;
+
+        // Nếu ở đầu trang
+        if (window.pageYOffset < 200) {
+          setActiveNavItem('#trang-chu');
+          return;
+        }
+
+        // Nếu chạm đáy trang (Footer)
+        if (
+          window.innerHeight + window.pageYOffset >=
+          document.documentElement.scrollHeight - 100
+        ) {
+          setActiveNavItem('#lien-he');
+          return;
+        }
+
+        // Kiểm tra vị trí từng section
+        for (let i = trackedSections.length - 1; i >= 0; i--) {
+          const sec = trackedSections[i];
+          if (sec.el) {
+            const top = sec.el.offsetTop - 120;
+            if (scrollPosition >= top) {
+              setActiveNavItem(sec.id);
+              break;
+            }
+          }
+        }
+      }, 50);
+    },
+    { passive: true }
+  );
 }
