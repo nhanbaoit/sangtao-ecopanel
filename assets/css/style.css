@@ -1850,11 +1850,12 @@ button {
 
 .footer-bottom-wrap {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
+  text-align: center;
   gap: 12px;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.6);
 }
 
